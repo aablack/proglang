@@ -10,7 +10,7 @@ fun same_string(s1 : string, s2 : string) =
 fun all_except_option(x, items) =
     case items of
 	[] => NONE
-      | xx::yy => if same_string(xx, x) then SOME yy else
+      | xx::yy => if xx = x then SOME yy else
 		  case all_except_option(x, yy) of
 		      NONE => NONE
 		    | SOME lst => SOME (xx::lst)
@@ -78,10 +78,9 @@ fun card_value(s:suit, r:rank) =
 
 
 fun remove_card(cards, card, e) =
-    case cards of
-	[] => raise e
-      | xx::[] => if xx = card then [] else raise e
-      | xx::yy => if xx = card then yy else xx::remove_card(yy, card, e)
+    case all_except_option(card, cards) of
+	NONE => raise e
+      | SOME lst => lst
 
 
 fun all_same_color(cards) =
@@ -111,3 +110,24 @@ fun score(cards, goal) =
 	if all_same_color(cards) then prelim div 2 else prelim
     end
 		       
+
+fun officiate(card_list, moves, goal) =
+    let fun run(card_list, held_cards, moves) =
+	let fun calc_score () =
+	    score(held_cards, goal)
+	in
+	    if sum_cards(held_cards) > goal then
+		calc_score
+	    else
+		case moves of
+		    [] => calc_score
+		  | (Discard c)::rest => run(card_list,
+					     remove_card(card_list, c, IllegalMove),
+					     rest)
+		  | Draw::rest => case card_list of
+				      [] => calc_score
+				    | xx::yy => run(yy, xx::held_cards, rest)
+	end
+    in
+	run(card_list, [], moves)
+    end
