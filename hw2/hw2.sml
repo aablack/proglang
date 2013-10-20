@@ -58,23 +58,25 @@ datatype move = Discard of card | Draw
 exception IllegalMove
 
 
-(* By specifying the type of s and r we enforce a valid card: suit*rank,
-is being passed in. This is probably not essential for the homework. *)
-fun card_color(s:suit, r:rank) =
-    case s of
-	Spades => Black
-      | Clubs => Black
-      | Diamonds => Red
-      | Hearts => Red
+fun card_color card =
+    let val (s, r) = card in
+	case s of
+	    Spades => Black
+	  | Clubs => Black
+	  | Diamonds => Red
+	  | Hearts => Red
+    end
 
 
-fun card_value(s:suit, r:rank) =
-    case r of
-	Jack => 10
-      | King => 10
-      | Queen => 10
-      | Ace => 11
-      | Num x => x
+fun card_value card =
+    let val (s, r) = card in
+	case r of
+	    Jack => 10
+	  | King => 10
+	  | Queen => 10
+	  | Ace => 11
+	  | Num x => x
+    end
 
 
 fun remove_card(cards, card, e) =
@@ -101,7 +103,6 @@ fun sum_cards(cards) =
     end
 
 
-
 fun score(cards, goal) =
     let val sum = sum_cards(cards)
 	val diff = sum - goal
@@ -113,19 +114,102 @@ fun score(cards, goal) =
 
 fun officiate(card_list, moves, goal) =
     let fun run(card_list, held_cards, moves) =
-	let fun calc_score () =
+	let fun calc_score() =
 	    score(held_cards, goal)
 	in
 	    if sum_cards(held_cards) > goal then
-		calc_score
+		calc_score()
 	    else
 		case moves of
-		    [] => calc_score
+		    [] => calc_score()
 		  | (Discard c)::rest => run(card_list,
-					     remove_card(card_list, c, IllegalMove),
+					     remove_card(held_cards, c, IllegalMove),
 					     rest)
 		  | Draw::rest => case card_list of
-				      [] => calc_score
+				      [] => calc_score()
+				    | xx::yy => run(yy, xx::held_cards, rest)
+	end
+    in
+	run(card_list, [], moves)
+    end
+
+
+		      
+(* challenge problems *)
+		      
+exception ListEmpty
+	
+
+(* card ranks can map to multiple values. Ace maps to either 1 or 11 *)
+fun card_value_challenge card =
+    let val (s, r) = card in
+	case r of
+	    Jack => [10]
+	  | King => [10]
+	  | Queen => [10]
+	  | Ace => [1,11]
+	  | Num x => [x]
+    end
+
+
+(* get the list of sums for all card value combinations *)
+fun sum_cards_challenge cards =
+    let fun add_to_list(lst, v) =
+	    case lst of
+		[] => []
+	      | xx::yy => (xx + v)::add_to_list(yy, v)
+					       
+	fun sum_combination(lst1, lst2) =
+	    case lst1 of
+		[] => []
+	      | xx::yy => add_to_list(lst2, xx)@sum_combination(yy, lst2)
+    in	
+	case cards of
+	    [] => [0]
+	  | xx::yy => sum_combination(card_value_challenge(xx), sum_cards_challenge(yy))
+    end
+
+	
+fun score_challenge(cards, goal) =
+    let	fun best_score sums =
+	    let fun get_score sum =
+		    let val diff = sum - goal in
+			if diff > 0 then 3 * diff else abs(diff)
+		    end
+	    in
+		case sums of
+		    [] => get_score 0
+		  | xx::[] => get_score xx
+		  | xx::yy => Int.min(get_score xx, best_score yy)
+	    end
+		
+	val prelim = best_score(sum_cards_challenge cards)
+    in
+	if all_same_color(cards) then prelim div 2 else prelim
+    end
+
+
+fun officiate_challenge(card_list, moves, goal) =
+    let fun run(card_list, held_cards, moves) =
+	let fun calc_score() =
+	    score_challenge(held_cards, goal)
+
+	    fun all_sums_exceed_goal(possible_sums) =
+		case possible_sums of
+		    xx::[] => xx > goal
+		  | xx::yy => xx > goal andalso all_sums_exceed_goal(yy)
+		
+	in
+	    if all_sums_exceed_goal(sum_cards_challenge held_cards) then
+		calc_score()
+	    else
+		case moves of
+		    [] => calc_score()
+		  | (Discard c)::rest => run(card_list,
+					     remove_card(held_cards, c, IllegalMove),
+					     rest)
+		  | (Draw)::rest => case card_list of
+				      [] => calc_score()
 				    | xx::yy => run(yy, xx::held_cards, rest)
 	end
     in

@@ -86,7 +86,7 @@ fun remove_duplicates(values:int list) =
     let fun remove_value(value:int, values:int list) =
 	if null values then []
 	else if hd values = value then remove_value(value, tl values)
-    else (hd values)::remove_value(value, tl values)
+	else (hd values)::remove_value(value, tl values)
     in			 
 	if null values then []
 	else (hd values) :: remove_duplicates(remove_value(hd values, tl values))
