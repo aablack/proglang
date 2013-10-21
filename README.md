@@ -1,4 +1,4 @@
-proglang
+Sandbox
 ========
 
-Homework assignments from the Programming Languages Coursera course. Do not cheat by looking at this repository if you are also enrolled in the course.
+Various code snippets covering areas of interest. Also covers material and assignments from online courses.
