@@ -12,6 +12,28 @@ val test4 = longest_string2 ["this", "is", "an", "incomprehensive", "list", "of"
 
 val test5 = longest_string2 ["have", "a", "nice", "day"] = "nice";
 
+val test6 = longest_string3 ["this", "is", "an", "incomprehensive", "list", "of",
+"strings"] = "incomprehensive"
+
+val test7 = longest_string3 ["have", "a", "nice", "day"] = "have";
+
+val test8 = longest_string4 ["this", "is", "an", "incomprehensive", "list", "of",
+"strings"] = "incomprehensive"
+
+val test9 = longest_string4 ["have", "a", "nice", "day"] = "nice";
+
+val test10 = longest_capitalized ["apple", "pineapple", "watermelon", "Pear"] = "Pear";
+
+val test11 = longest_capitalized ["apple", "pineapple", "watermelon"] = "";
+
+val test12 = rev_string "abc" = "cba";
+
+val test13 = first_answer (fn x => if x >= 5 then SOME x else NONE)
+			  [1, 4, 5, 9] = 5;
+
+val test14 = (first_answer (fn x => if x >= 5 then SOME x else NONE)
+			  [1, 4, 3, 2]; false) handle NoAnswer => true;
+			  
 (*
 val test2 = longest_string1 ["A","bc","C"] = "bc"
 
