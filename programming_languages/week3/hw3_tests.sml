@@ -47,17 +47,14 @@ val test19 = count_wildcards (TupleP [Variable "foo", ConstructorP ("bar",
                               ConstP 100)]) = 0;
 
 val test20 = count_wild_and_variable_lengths (TupleP [Variable "foo", Wildcard, Wildcard,
-                              ConstructorP ("bar", Variable "foobarfoo")]) = 14;
+						      ConstructorP ("bar", Variable "foobarfoo")]) = 14;
 
 val test21 = count_some_var ("foo", (ConstructorP("foo", TupleP [Variable "foo",
                              Wildcard, TupleP [Variable "foo"]]))) = 2;
 
+val test22 = check_pat (TupleP [Variable "x", Variable "x", ConstructorP ("x", Variable "x")]) = false;
 
-
-
-
-
-
+val test23 = check_pat (TupleP [Variable "x", Variable "y", ConstructorP ("x", Variable "z")]) = true;
 
 
 

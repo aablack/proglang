@@ -90,3 +90,20 @@ fun count_wild_and_variable_lengths pattern =
 fun count_some_var (name, pattern) =
     g (fn () => 0) (fn var => if var = name then 1 else 0) pattern
 
+(* Q10 *)
+fun check_pat pattern =
+    let fun vars(pattern) =
+	    case pattern of
+		Wildcard          => []
+              | Variable x        => [x]
+              | TupleP ps         => List.foldl (fn (p, acc) => (vars p)@acc) [] ps
+              | ConstructorP(_,p) => vars  p
+              | _                 => []		 
+	fun distinctp (lst) =
+	    case lst of
+		[] => true
+	      | x::ys => not (List.exists (fn j => j = x) ys) andalso distinctp ys
+    in
+	distinctp (vars pattern)
+    end
+					 
