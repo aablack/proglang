@@ -15,15 +15,15 @@ datatype valu = Const of int
 	      | Constructor of string * valu
 
 fun g f1 f2 p =
-    let 
-	val r = g f1 f2 
+    let
+        val r = g f1 f2 
     in
-	case p of
-	    Wildcard          => f1 ()
-	  | Variable x        => f2 x
-	  | TupleP ps         => List.foldl (fn (p,i) => (r p) + i) 0 ps
-	  | ConstructorP(_,p) => r p
-	  | _                 => 0
+        case p of
+            Wildcard          => f1 ()
+          | Variable x        => f2 x
+          | TupleP ps         => List.foldl (fn (p,i) => (r p) + i) 0 ps
+          | ConstructorP(_,p) => r p
+          | _                 => 0
     end
 
 (**** for the challenge problem only ****)
@@ -67,3 +67,26 @@ fun first_answer f lst =
       | x::ys => case f x of
 		     SOME k => k
 		   | NONE => first_answer f ys
+
+(* Q8 *)
+fun all_answers f lst =
+    let fun aux(lst, acc) =
+        case lst of
+             [] => acc
+           | x::ys => case f x of
+                           NONE => raise NoAnswer
+                         | SOME lst => aux (ys, lst@acc)
+    in
+        SOME (aux (lst, [])) handle NoAnswer => NONE
+    end
+
+(* Q9 *)
+fun count_wildcards pattern =
+    g (fn () => 1) (fn _ => 0) pattern
+
+fun count_wild_and_variable_lengths pattern =
+    g (fn () => 1) (fn var => String.size var) pattern
+
+fun count_some_var (name, pattern) =
+    g (fn () => 0) (fn var => if var = name then 1 else 0) pattern
+

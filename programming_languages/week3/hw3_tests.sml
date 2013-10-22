@@ -33,7 +33,36 @@ val test13 = first_answer (fn x => if x >= 5 then SOME x else NONE)
 
 val test14 = (first_answer (fn x => if x >= 5 then SOME x else NONE)
 			  [1, 4, 3, 2]; false) handle NoAnswer => true;
-			  
+
+val test15 = all_answers (fn x => if x = 1 then SOME [x] else NONE) [1, 1, 1] = SOME [1,1,1];
+
+val test16 = all_answers (fn x => if x = 1 then SOME [x] else NONE) [1, 1, 2] = NONE;
+
+val test17 = all_answers (fn x => if x = 1 then SOME [x] else NONE) [] = SOME [];
+
+val test18 = count_wildcards (TupleP [Variable "foo", Wildcard, Wildcard,
+                              ConstructorP ("bar", Wildcard)]) = 3;
+
+val test19 = count_wildcards (TupleP [Variable "foo", ConstructorP ("bar",
+                              ConstP 100)]) = 0;
+
+val test20 = count_wild_and_variable_lengths (TupleP [Variable "foo", Wildcard, Wildcard,
+                              ConstructorP ("bar", Variable "foobarfoo")]) = 14;
+
+val test21 = count_some_var ("foo", (ConstructorP("foo", TupleP [Variable "foo",
+                             Wildcard, TupleP [Variable "foo"]]))) = 2;
+
+
+
+
+
+
+
+
+
+
+
+
 (*
 val test2 = longest_string1 ["A","bc","C"] = "bc"
 
