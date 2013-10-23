@@ -56,7 +56,28 @@ val test22 = check_pat (TupleP [Variable "x", Variable "x", ConstructorP ("x", V
 
 val test23 = check_pat (TupleP [Variable "x", Variable "y", ConstructorP ("x", Variable "z")]) = true;
 
+val test24 = match (Const 10, Wildcard) = SOME [];
 
+val test25 = match (Tuple [Const 10, Unit], Variable "x" =
+	     SOME [ ("x", Tuple [Const 10, Unit]) ];
+
+val test26 = match (Const 10, UnitP) = NONE;
+
+val test27 = match (Unit, UnitP) = SOME [];
+
+val test28 = match (Const 20, ConstP 19) = NONE;
+
+val test29 = match (Const 20, ConstP 20) = SOME [];
+
+val test30 = match (Tuple [Const 20, Unit], TupleP [Const 20, Const 0]) = NONE;
+
+val test31 = match (Constructor ("x", Unit), ConstructorP ("y", UnitP)) = NONE;
+
+val test32 = match (Constructor ("x", Unit), ConstructorP ("x", UnitP)) = NONE;
+
+val test32 = match (Constructor ("x", Tuple [Const 10]), ConstructorP ("x", TupleP [ConstP 10])) = SOME [];
+
+val test33 = match (Tuple [Const 10, Const 20], TupleP [Variable "x", Wildcard]) = SOME [("x", Const 10)];
 
 
 
