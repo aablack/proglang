@@ -56,18 +56,18 @@ val rev_string = String.implode o rev o String.explode;
 fun first_answer f lst =
     case lst of
 	[] => raise NoAnswer
-      | x::ys => case f x of
+      | x::xs => case f x of
 		     SOME k => k
-		   | NONE => first_answer f ys
+		   | NONE => first_answer f xs
 
 (* Q8 *)
 fun all_answers f lst =
     let fun aux(lst, acc) =
         case lst of
              [] => acc
-           | x::ys => case f x of
+           | x::xs => case f x of
                            NONE => raise NoAnswer
-                         | SOME lst => aux (ys, lst@acc)
+                         | SOME lst => aux (xs, lst@acc)
     in
         SOME (aux (lst, [])) handle NoAnswer => NONE
     end
@@ -94,7 +94,7 @@ fun check_pat pat =
 	fun distinctp (lst) =
 	    case lst of
 		[] => true
-	      | x::ys => not (List.exists (fn j => j = x) ys) andalso distinctp ys
+	      | x::xs => not (List.exists (fn j => j = x) xs) andalso distinctp xs
     in
 	distinctp (get_vars pat)
     end
