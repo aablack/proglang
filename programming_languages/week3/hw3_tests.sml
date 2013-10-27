@@ -1,5 +1,6 @@
 use "hw3.sml";
 
+
 val test1 = only_capitals ["I", "am", "Fred"] = ["I", "Fred"]
 
 val test2 = longest_string1 ["this", "is", "an", "incomprehensive", "list", "of",
@@ -58,8 +59,7 @@ val test23 = check_pat (TupleP [Variable "x", Variable "y", ConstructorP ("x", V
 
 val test24 = match (Const 10, Wildcard) = SOME [];
 
-val test25 = match (Tuple [Const 10, Unit], Variable "x" =
-	     SOME [ ("x", Tuple [Const 10, Unit]) ];
+val test25 = match (Tuple [Const 10, Unit], Variable "x") = SOME [ ("x", Tuple [Const 10, Unit]) ];
 
 val test26 = match (Const 10, UnitP) = NONE;
 
@@ -69,44 +69,32 @@ val test28 = match (Const 20, ConstP 19) = NONE;
 
 val test29 = match (Const 20, ConstP 20) = SOME [];
 
-val test30 = match (Tuple [Const 20, Unit], TupleP [Const 20, Const 0]) = NONE;
+val test30 = match (Tuple [Const 20, Unit],
+		    TupleP [ConstP 20, ConstP 0]) = NONE;
 
-val test31 = match (Constructor ("x", Unit), ConstructorP ("y", UnitP)) = NONE;
+val test31 = match (Constructor ("x", Unit),
+		    ConstructorP ("y", UnitP)) = NONE;
 
-val test32 = match (Constructor ("x", Unit), ConstructorP ("x", UnitP)) = NONE;
+val test32 = match (Constructor ("x", Unit),
+		    ConstructorP ("x", UnitP)) = SOME [];
 
-val test32 = match (Constructor ("x", Tuple [Const 10]), ConstructorP ("x", TupleP [ConstP 10])) = SOME [];
+val test32 = match (Constructor ("x", Tuple [Const 10]),
+		    ConstructorP ("x", TupleP [ConstP 10])) = SOME [];
 
-val test33 = match (Tuple [Const 10, Const 20], TupleP [Variable "x", Wildcard]) = SOME [("x", Const 10)];
+val test33 = match (Tuple [Const 10, Const 20],
+		    TupleP [Variable "x", Wildcard]) = SOME [("x", Const 10)];
 
+val test34 = match (Tuple [Unit, Unit],
+		    TupleP [UnitP]) = NONE;
 
+val test35 = first_match (Tuple [Unit, Const 10])
+			 [UnitP,
+			  ConstructorP ("x", UnitP),
+			  ConstP 10,
+			  TupleP [UnitP, Variable "x"]] = SOME [("x", Const 10)];
 
-(*
-val test2 = longest_string1 ["A","bc","C"] = "bc"
-
-val test3 = longest_string2 ["A","bc","C"] = "bc"
-
-val test4a= longest_string3 ["A","bc","C"] = "bc"
-
-val test4b= longest_string4 ["A","B","C"] = "C"
-
-val test5 = longest_capitalized ["A","bc","C"] = "A";
-
-val test6 = rev_string "abc" = "cba";
-
-val test7 = first_answer (fn x => if x > 3 then SOME x else NONE) [1,2,3,4,5] = 4
-
-val test8 = all_answers (fn x => if x = 1 then SOME [x] else NONE) [2,3,4,5,6,7] = NONE
-
-val test9a = count_wildcards Wildcard = 1
-
-val test9b = count_wild_and_variable_lengths (Variable("a")) = 1
-
-val test9c = count_some_var ("x", Variable("x")) = 1;
-
-val test10 = check_pat (Variable("x")) = true
-
-val test11 = match (Const(1), UnitP) = NONE
-
-val test12 = first_match Unit [UnitP] = SOME []
-*)
+val test36 = first_match (Tuple [Unit, Const 10])
+			 [UnitP,
+			  ConstructorP ("x", UnitP),
+			  ConstP 10,
+			  TupleP [ConstP 10, Variable "x"]] = NONE;

@@ -26,14 +26,6 @@ fun g f1 f2 p =
           | _                 => 0
     end
 
-(**** for the challenge problem only ****)
-
-datatype typ = Anything
-	     | UnitT
-	     | IntT
-	     | TupleT of typ list
-	     | Datatype of string
-
 (* Q1 *)
 fun only_capitals lst =
     List.filter (fn s => Char.isUpper (String.sub (s, 0))) lst
@@ -81,29 +73,92 @@ fun all_answers f lst =
     end
 
 (* Q9 *)
-fun count_wildcards pattern =
-    g (fn () => 1) (fn _ => 0) pattern
+fun count_wildcards pat =
+    g (fn () => 1) (fn _ => 0) pat
 
-fun count_wild_and_variable_lengths pattern =
-    g (fn () => 1) (fn var => String.size var) pattern
+fun count_wild_and_variable_lengths pat =
+    g (fn () => 1) (fn var => String.size var) pat
 
-fun count_some_var (name, pattern) =
-    g (fn () => 0) (fn var => if var = name then 1 else 0) pattern
+fun count_some_var (name, pat) =
+    g (fn () => 0) (fn n => if name= n then 1 else 0) pat
 
 (* Q10 *)
-fun check_pat pattern =
-    let fun vars(pattern) =
-	    case pattern of
+fun check_pat pat =
+    let fun get_vars (pat) =
+	    case pat of
 		Wildcard          => []
               | Variable x        => [x]
-              | TupleP ps         => List.foldl (fn (p, acc) => (vars p)@acc) [] ps
-              | ConstructorP(_,p) => vars  p
-              | _                 => []		 
+              | TupleP ps         => List.foldl (fn (p, acc) => (get_vars p)@acc) [] ps
+              | ConstructorP(_,p) => get_vars  p
+              | _                 => []
 	fun distinctp (lst) =
 	    case lst of
 		[] => true
 	      | x::ys => not (List.exists (fn j => j = x) ys) andalso distinctp ys
     in
-	distinctp (vars pattern)
+	distinctp (get_vars pat)
     end
-					 
+
+(* Q11 *)
+fun match (valu, pat) =
+    case (valu, pat) of
+	(_, Wildcard) => SOME []
+      | (v, Variable s) => SOME [(s, v)]
+      | (Unit, UnitP) => SOME []
+      | (Const x, ConstP y) => if x = y then SOME [] else NONE
+      | (Tuple vs, TupleP ps) => if length vs = length ps
+				 then all_answers match (ListPair.zip (vs, ps))
+				 else NONE
+      | (Constructor (s1, v), ConstructorP (s2, p)) => if s1 = s2
+						       then match (v, p)
+						       else NONE
+      | _ => NONE
+
+(* Q12 *)
+fun first_match valu pats =
+    SOME (first_answer (fn p => match (valu, p)) pats)
+    handle NoAnswer => NONE
+
+(* Q13 *)
+datatype typ = Anything
+	     | UnitT
+	     | IntT
+	     | TupleT of typ list
+	     | Datatype of string
+
+exception TypeError
+
+fun typecheck_patterns (constructors:(string*string*typ) list, patterns) =
+    let fun get_general_type(typ1, typ2) =
+	    case (typ1, typ2) of
+		(t, Anything) => t
+	      | (Anything, t) => t
+	      | (UnitT, UnitT) => UnitT
+	      | (IntT, IntT) => IntT
+	      | (TupleT ts1, TupleT ts2) => if length ts1 = length ts2
+					    then TupleT (List.map get_general_type
+								  (ListPair.zip (ts1, ts2)))
+					    else raise TypeError
+	      | (Datatype s1, Datatype s2) => if s1 = s2 then Datatype s1 else raise TypeError
+	      | _ => raise TypeError
+
+	fun get_type pat =
+	    case pat of
+		Wildcard => Anything
+	      | Variable x => Anything
+	      | UnitP => UnitT
+	      | ConstP n => IntT
+	      | TupleP ps => TupleT (List.map (fn x => get_type x) ps)
+	      | ConstructorP (s, p) => case List.find (fn x => #1 x = s) constructors of
+					   NONE => raise TypeError
+					 | SOME ctr => (get_general_type(#3 ctr, get_type p);
+							Datatype (#2 ctr))
+				   	
+    in
+	if null patterns then
+	    NONE
+	else
+	    SOME (List.foldl (fn (x, acc) => get_general_type (get_type x, acc)) Anything patterns)
+	    handle TypeError => NONE
+    end
+
