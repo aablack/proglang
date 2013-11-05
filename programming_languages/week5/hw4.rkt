@@ -23,11 +23,11 @@
 
 ; Q4
 (define (stream-for-n-steps s n)
-  (define item (s))
+  (define pair (s))
   (if (<= n 0)
       null
-      (cons (car item)
-            (stream-for-n-steps (cdr item) (- n 1)))))
+      (cons (car pair)
+            (stream-for-n-steps (cdr pair) (- n 1)))))
 
 ; Q5
 (define (funny-number-stream)
@@ -41,7 +41,15 @@
   (define (dog) (cons "dog.jpg" dan))
   (dan))
 
-;Q7
+; Q7
 (define (stream-add-zero s)
-  (define value (s))
-  null)
+  (define pair (s))
+  (lambda () (cons (cons 0 (car pair))
+                   (stream-add-zero (cdr pair)))))
+
+; Q8
+(define (cycle-lists xs ys)
+  (define (cycle i)
+    (lambda() (cons (cons (list-nth-mod xs i) (list-nth-mod ys i))
+          (cycle (+ i 1)))))
+  (cycle 0))
