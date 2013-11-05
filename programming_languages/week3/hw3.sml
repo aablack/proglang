@@ -77,10 +77,10 @@ fun count_wildcards pat =
     g (fn () => 1) (fn _ => 0) pat
 
 fun count_wild_and_variable_lengths pat =
-    g (fn () => 1) (fn var => String.size var) pat
+    g (fn () => 1) String.size pat
 
 fun count_some_var (name, pat) =
-    g (fn () => 0) (fn n => if name= n then 1 else 0) pat
+    g (fn () => 0) (fn n => if name=n then 1 else 0) pat
 
 (* Q10 *)
 fun check_pat pat =
