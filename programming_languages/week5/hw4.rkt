@@ -14,3 +14,34 @@
   (map (lambda (item) (string-append item suffix)) xs)) 
 
 ; Q3
+(define (list-nth-mod xs n)
+  (cond [(< n 0) (error "list-nth-mod: empty list")]
+        [(null? xs) (error "list-nth-mod: empty list")]
+        [#t (car (list-tail
+                  xs
+                  (remainder n (length xs))))]))
+
+; Q4
+(define (stream-for-n-steps s n)
+  (define item (s))
+  (if (<= n 0)
+      null
+      (cons (car item)
+            (stream-for-n-steps (cdr item) (- n 1)))))
+
+; Q5
+(define (funny-number-stream)
+  (define (count x) (cons (if (= (remainder x 5) 0) (- x) x)
+                          (lambda () (count (+ x 1)))))
+  (count 1))
+
+; Q6
+(define (dan-then-dog)
+  (define (dan) (cons "dan.jpg" dog))
+  (define (dog) (cons "dog.jpg" dan))
+  (dan))
+
+;Q7
+(define (stream-add-zero s)
+  (define value (s))
+  null)

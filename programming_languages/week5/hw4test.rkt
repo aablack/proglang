@@ -10,6 +10,10 @@
 
 ;; Helper functions
 (define ones (lambda () (cons 1 ones)))
+(define (nats)
+  (define (count x) (cons x (lambda () (count (+ x 1)))))
+  (count 1))
+  
 (define a 2)
 
 (define tests
@@ -22,24 +26,28 @@
    (check-equal? (sequence 1 10 2) (list 1 3 5 7 9) "sequence test1")
 
    ; string-append-map test
-   ;(check-equal? (string-append-map 
-   ;               (list "dan" "dog" "curry" "dog2") 
-   ;               ".jpg") '("dan.jpg" "dog.jpg" "curry.jpg" "dog2.jpg") "string-append-map test")
+   (check-equal? (string-append-map 
+                  (list "dan" "dog" "curry" "dog2") 
+                  ".jpg") '("dan.jpg" "dog.jpg" "curry.jpg" "dog2.jpg") "string-append-map test")
    
    ; list-nth-mod test
-   ;(check-equal? (list-nth-mod (list 0 1 2 3 4) 2) 2 "list-nth-mod test")
+   (check-equal? (list-nth-mod (list 0 1 2 3 4) 2) 2 "list-nth-mod test1")
+   
+   (check-equal? (list-nth-mod (list 0 1 2 3 4) 5) 0 "list-nth-mod test2")
    
    ; stream-for-n-steps test
-   ;(check-equal? (stream-for-n-steps (lambda () (cons 1 ones)) 1) (list 1) "stream-for-n-steps test")
+   (check-equal? (stream-for-n-steps (lambda () (cons 1 ones)) 1) (list 1) "stream-for-n-steps test 1")
+   
+   (check-equal? (stream-for-n-steps nats 5) (list 1 2 3 4 5) "stream-for-n-steps test 2")
    
    ; funny-number-stream test
-   ;(check-equal? (stream-for-n-steps funny-number-stream 16) (list 1 2 3 4 -5 6 7 8 9 -10 11 12 13 14 -15 16) "funny-number-stream test")
+   (check-equal? (stream-for-n-steps funny-number-stream 16) (list 1 2 3 4 -5 6 7 8 9 -10 11 12 13 14 -15 16) "funny-number-stream test")
    
    ; dan-then-dog test
-   ;(check-equal? (stream-for-n-steps dan-then-dog 1) (list "dan.jpg") "dan-then-dog test")
+   (check-equal? (stream-for-n-steps dan-then-dog 3) (list "dan.jpg" "dog.jpg" "dan.jpg") "dan-then-dog test")
    
    ; stream-add-zero test
-   ;(check-equal? (stream-for-n-steps (stream-add-zero ones) 1) (list (cons 0 1)) "stream-add-zero test")
+   (check-equal? (stream-for-n-steps (stream-add-zero ones) 1) (list (cons 0 1)) "stream-add-zero test")
    
    ; cycle-lists test
    ;(check-equal? (stream-for-n-steps (cycle-lists (list 1 2 3) (list "a" "b")) 3) (list (cons 1 "a") (cons 2 "b") (cons 3 "a")) 
