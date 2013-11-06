@@ -53,3 +53,15 @@
     (lambda() (cons (cons (list-nth-mod xs i) (list-nth-mod ys i))
           (cycle (+ i 1)))))
   (cycle 0))
+
+; Q9
+(define (vector-assoc v vec)
+  (define (check-assoc i)
+    (if (< i (vector-length vec))
+        (let ([elem (vector-ref vec i)])
+          (if (and (pair? elem) (equal? v (car elem)))
+              elem
+              (check-assoc (+ i 1))))
+        #f))
+  (check-assoc 0))
+  
