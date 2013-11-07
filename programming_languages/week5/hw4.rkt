@@ -65,3 +65,25 @@
         #f))
   (check-assoc 0))
   
+; Q10
+(define (cached-assoc xs n)
+  (define index 0)
+  (define cache (make-vector n null))
+  ; Return a function to lookup v from the cache first
+  (lambda (v)
+    (let ([ans (vector-assoc v cache)])
+      (or ans
+          (let ([ans (assoc v xs)])
+            (if ans
+                (begin (vector-set! cache index ans)
+                       (set! index (remainder (+ index 1) n))
+                       ans)
+                #f))))))
+  
+  
+                
+    
+                    
+    
+    
+  

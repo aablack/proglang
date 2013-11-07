@@ -60,7 +60,7 @@
    (check-equal? (vector-assoc 5 (vector)) #f "vector-assoc test4")
    
    ; cached-assoc tests
-   ;(check-equal? ((cached-assoc (list (cons 1 2) (cons 3 4)) 3) 3) (cons 3 4) "cached-assoc test")
+   (check-equal? ((cached-assoc (list (cons 1 2) (cons 3 4)) 3) 3) (cons 3 4) "cached-assoc test")
    
    ; while-less test
    ;(check-equal? (while-less 7 do (begin (set! a (+ a 1)) a)) #t "while-less test")
