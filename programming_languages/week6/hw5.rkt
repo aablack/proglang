@@ -83,6 +83,12 @@
         [(isaunit? e)
          (let ([v (eval-under-env (isaunit-e e) env)])
            (int (if (aunit? v) 1 0)))]
+        [(fun? e)
+           (closure env e)]
+        [(call? e)
+         (let ([
+           
+         
         ))
 
 ;; Do NOT change
