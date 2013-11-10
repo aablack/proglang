@@ -83,13 +83,21 @@
         [(isaunit? e)
          (let ([v (eval-under-env (isaunit-e e) env)])
            (int (if (aunit? v) 1 0)))]
-        [(fun? e)
-           (closure env e)]
+        [(fun? e) (closure env e)]
         [(call? e)
-         (let ([
-           
-         
-        ))
+         (let ([cl (eval-under-env (call-funexp e) env)]
+               [param (eval-under-env (call-actual e) env)])
+           (let ([cenv (closure-env cl)]
+                 [fun (closure-fun cl)])
+             (let ([fname (fun-nameopt fun)]
+                   [fargname (fun-formal fun)]
+                   [fbody (fun-body fun)])
+               (let ([extenv (cons (cons fargname param)
+                                   (if fname
+                                       (cons (cons fname cl) cenv)
+                                       cenv))])
+                 (eval-under-env fbody extenv)))))]
+        [#t (error "Unrecognised MUPL expression")]))
 
 ;; Do NOT change
 (define (eval-exp e)
@@ -97,11 +105,19 @@
         
 ;; Problem 3
 
-(define (ifaunit e1 e2 e3) "CHANGE")
+(define (ifaunit e1 e2 e3) (ifgreater (isaunit e1) (int 0) e2 e3))
 
-(define (mlet* lstlst e2) "CHANGE")
+(define (mlet* lstlst e2)
+  (if (null? lstlst) e2
+      (let ([var (caar lstlst)] ;first element in first pair
+            [expr (cdar lstlst)]) ;second element in first pair
+        (mlet var expr (mlet* (cdr lstlst) e2)))))
 
-(define (ifeq e1 e2 e3 e4) "CHANGE")
+(define (ifeq e1 e2 e3 e4)
+  (mlet* (list (cons "_x" e1) (cons "_y" e2))
+         (ifgreater (var "_x") (var "_y") e4
+                    (ifgreater (var "_y") (var "_x") e4 e3))))
+
 
 ;; Problem 4
 
