@@ -137,8 +137,47 @@
 
 ;; We will test this function directly, so it must do
 ;; as described in the assignment
-(define (compute-free-vars e) "CHANGE")
-
+(define (compute-free-vars e)
+  ; get the shadowed vars declared in a function but
+  ; do not go recursively into nested functions.
+  (define (get-shadowed-vars vars e)
+    (if (mlet? e)
+        (get-shadowed-vars (set-add vars (mlet-var e)) (mlet-body e))
+        vars))
+  
+  ; get all the variables referenced in an expression
+  (define (get-referenced-vars e)
+    (cond [(var? e) (set (var-string e))]
+          [(add? e) (set-union (get-referenced-vars (add-e1 e))
+                               (get-referenced-vars (add-e2 e)))]
+          [(ifgreater? e) (set-union (get-referenced-vars (ifgreater-e1 e))
+                                     (get-referenced-vars (ifgreater-e2 e))
+                                     (get-referenced-vars (ifgreater-e3 e))
+                                     (get-referenced-vars (ifgreater-e4 e)))]
+          [(call? e) (set (get-referenced-vars (call-actual e)))]
+          [(mlet? e) (set-union (get-referenced-vars (mlet-e e))
+                                (get-referenced-vars (mlet-body e)))]
+          [(apair? e) (set-union (get-referenced-vars (apair-e1 e))
+                                 (get-referenced-vars (apair-e2 e)))]
+          [(fun? e) (get-referenced-vars (fun-body e))]
+          [#t (set)]))
+     
+  (define (transform e)
+    (cond [(fun? e)
+           (fun-challenge (fun-nameopt e)
+                          (fun-formal e)
+                          (transform (fun-body e))
+                          (set-subtract (get-referenced-vars (fun-body e))
+                                        (get-shadowed-vars (set) (fun-body e))
+                                        (set (fun-formal e))))]
+          [(apair? e) (apair (transform (apair-e1 e)) (transform (apair-e2 e)))]
+          [(mlet? e)
+           (mlet (mlet-var e)
+                 (mlet-e e)
+                 (transform (mlet-body e)))]
+          [#t e]))
+  (transform e))
+  
 ;; Do NOT share code with eval-under-env because that will make
 ;; auto-grading and peer assessment more difficult, so
 ;; copy most of your interpreter here and make minor changes
