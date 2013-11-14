@@ -42,10 +42,10 @@
 (define (eval-under-env e env)
   (define (get-pair e)
     (let ([v (eval-under-env e env)])
-           (if (apair? v)
-               v
-               (error "MUPL expression is not a pair"))))
-    
+      (if (apair? v)
+          v
+          (error "MUPL expression is not a pair"))))
+  
   (cond [(var? e)
          (envlookup env (var-string e))]
         [(int? e) e]
@@ -102,7 +102,7 @@
 ;; Do NOT change
 (define (eval-exp e)
   (eval-under-env e null))
-        
+
 ;; Problem 3
 
 (define (ifaunit e1 e2 e3) (ifgreater (isaunit e1) (int 0) e2 e3))
@@ -158,52 +158,51 @@
           [(apair? e) (set-union
                        (gfv shadowed-vars (apair-e1 e))
                        (gfv shadowed-vars (apair-e2 e)))]
-          [(fun? e) (set-subtract (gfv (set (fun-formal e)) (fun-body e))
-                                  (set (fun-nameopt e)
-                                       (fun-formal e)))]
+          [(fun? e) (set-subtract (gfv (set (fun-nameopt e) (fun-formal e)) (fun-body e))
+                                  (set (fun-nameopt e) (fun-formal e)))]
           [(fst? e) (gfv shadowed-vars (fst-e e))]
           [(snd? e) (gfv shadowed-vars (snd-e e))]
           [(isaunit? e) (gfv shadowed-vars (isaunit-e e))]
           [#t (set)]))
-     
-    (cond [(fun? e)
-           (fun-challenge (fun-nameopt e)
-                          (fun-formal e)
-                          (compute-free-vars (fun-body e))
-                          (gfv (set) e))]
-          [(mlet? e)
-           (mlet (mlet-var e) 
-                 (compute-free-vars (mlet-e e))
-                 (compute-free-vars (mlet-body e)))]
-          [(ifgreater? e)
-           (ifgreater (ifgreater-e1 e)
-                      (ifgreater-e2 e)
-                      (compute-free-vars (ifgreater-e3 e))
-                      (compute-free-vars (ifgreater-e4 e)))]
-          [(apair? e)
-           (apair (compute-free-vars (apair-e1 e)) (compute-free-vars (apair-e2 e)))]
-          [(add? e)
-           (add (compute-free-vars (add-e1 e)) (compute-free-vars (add-e2 e)))]
-          [(call? e)
-           (call (compute-free-vars (call-funexp e)) (compute-free-vars (call-actual e)))]
-          [(fst? e)
-           (fst (compute-free-vars (fst-e e)))]
-          [(snd? e)
-           (snd (compute-free-vars (snd-e e)))]
-          [(isaunit? e)
-           (isaunit (compute-free-vars (isaunit-e e)))]
-          [#t e]))
   
+  (cond [(add? e)
+         (add (compute-free-vars (add-e1 e)) (compute-free-vars (add-e2 e)))]
+        [(ifgreater? e)
+         (ifgreater (compute-free-vars (ifgreater-e1 e))
+                    (compute-free-vars (ifgreater-e2 e))
+                    (compute-free-vars (ifgreater-e3 e))
+                    (compute-free-vars (ifgreater-e4 e)))]
+        [(call? e)
+         (call (compute-free-vars (call-funexp e)) (compute-free-vars (call-actual e)))]
+        [(mlet? e)
+         (mlet (mlet-var e) 
+               (compute-free-vars (mlet-e e))
+               (compute-free-vars (mlet-body e)))]
+        [(apair? e)
+         (apair (compute-free-vars (apair-e1 e)) (compute-free-vars (apair-e2 e)))]
+        [(fun? e)
+         (fun-challenge (fun-nameopt e)
+                        (fun-formal e)
+                        (compute-free-vars (fun-body e))
+                        (gfv (set) e))]
+        [(fst? e)
+         (fst (compute-free-vars (fst-e e)))]
+        [(snd? e)
+         (snd (compute-free-vars (snd-e e)))]
+        [(isaunit? e)
+         (isaunit (compute-free-vars (isaunit-e e)))]
+        [#t e]))
+
 ;; Do NOT share code with eval-under-env because that will make
 ;; auto-grading and peer assessment more difficult, so
 ;; copy most of your interpreter here and make minor changes
 (define (eval-under-env-c e env)
-    (define (get-pair e)
+  (define (get-pair e)
     (let ([v (eval-under-env-c e env)])
-           (if (apair? v)
-               v
-               (error "MUPL expression is not a pair"))))
-    
+      (if (apair? v)
+          v
+          (error "MUPL expression is not a pair"))))
+  
   (cond [(var? e)
          (envlookup env (var-string e))]
         [(int? e) e]
@@ -230,7 +229,7 @@
          (let ([var (mlet-var e)]
                [val (eval-under-env-c (mlet-e e) env)])
            (eval-under-env-c (mlet-body e) (cons (cons var val)
-                                               env)))]
+                                                 env)))]
         [(apair? e)
          (apair (eval-under-env-c (apair-e1 e) env)
                 (eval-under-env-c (apair-e2 e) env))]
