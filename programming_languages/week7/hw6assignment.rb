@@ -52,6 +52,7 @@ class MyBoard < Board
         if !@cheat && score >= 100
             @cheat = true
             @score -= 100
+            @game.update_score
         end
     end
 end
