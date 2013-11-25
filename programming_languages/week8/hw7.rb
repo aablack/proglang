@@ -152,20 +152,24 @@ class Point < GeometryValue
     end
     def intersectVerticalLine(vline)
         if real_close(vline.x, x)
-            VerticalLine(x)
+            VerticalLine.new(x)
         else
             NoPoints.new
         end
     end
     def intersectWithSegmentAsLineResult(seg)
-        in_between(x, seg.x1, seg.x2) && in_between(y, seg.y1, seg.y2)
+        if in_between(x, seg.x1, seg.x2) && in_between(y, seg.y1, seg.y2)
+            Point.new(x,y)
+        else
+            NoPoints.new
+        end
     end
 end
 
 class Line < GeometryValue
     # *add* methods to this class -- do *not* change given code and do not
     # override any methods
-    attr_reader :m, :b 
+    attr_reader :m, :b
     def initialize(m,b)
         @m = m
         @b = b
@@ -193,7 +197,7 @@ class Line < GeometryValue
                 NoPoints.new
             end
         else
-            xint = (self.b - b) / (m - self.m)
+            xint = (line.b - b) / (m - line.m)
             yint = m * xint + b
             Point.new(xint,yint)
         end
@@ -202,7 +206,7 @@ class Line < GeometryValue
         Point.new(vline.x, m * vline.x + b)
     end
     def intersectWithSegmentAsLineResult(seg)
-        self
+        seg
     end
 end
 
@@ -239,7 +243,7 @@ class VerticalLine < GeometryValue
         end
     end
     def intersectWithSegmentAsLineResult(seg)
-        self
+        seg
     end
 end
 
@@ -265,7 +269,7 @@ class LineSegment < GeometryValue
                 Point.new(x1,y2)
             elsif y1 > y2
                 LineSegment.new(x1,y2,x2,y1)
-            else 
+            else
                 LineSegment.new(x1,y1,x2,y2)
             end
         elsif x1 > x2 then
@@ -343,7 +347,7 @@ class Intersect < GeometryExpression
         e1.intersect(e2)
     end
     def preprocess_prog
-        Intersect.new(@e1.preprocess_prog, @e2.preproces_prog)
+        Intersect.new(@e1.preprocess_prog, @e2.preprocess_prog)
     end
 end
 
@@ -358,7 +362,7 @@ class Let < GeometryExpression
     end
     def eval_prog env
         e1 = @e1.eval_prog(env)
-        newenv = [s,e1] + env
+        newenv = [[@s,e1]] + env
         @e2.eval_prog(newenv)
 
     end
@@ -392,10 +396,10 @@ class Shift < GeometryExpression
         @e = e
     end
     def eval_prog(env)
-        @e.eval_prog.shift(@dx,@dy)
+        @e.eval_prog(env).shift(@dx,@dy)
     end
     def preprocess_prog
-        Shift.new(dx, dy, e.preprocess_prog)
+        Shift.new(@dx, @dy, @e.preprocess_prog)
     end
 end
 
