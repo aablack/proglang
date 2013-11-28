@@ -294,41 +294,27 @@ class LineSegment < GeometryValue
         vline.intersectLineSegment(self)
     end
     def intersectWithSegmentAsLineResult(seg)
-        seg1 = (x1start,y1start,x1end,y1end = seg.x1, seg.y1, seg.x2, seg.y2)
-        seg2 = (x2start,y2start,x2end,y2end = self.x1, self.y1, self.x2, self.y2)
-        if real_close(x1start,x1end)
-            if y1start < y2start
-                aXstart,aYstart,aXend,aYend = seg1
-                bXstart,bYstart,bXend,bYend = seg2
-            else
-                aXstart,aYstart,aXend,aYend = seg2
-                bXstart,bYstart,bXend,bYend = seg1
-            end
-            if real_close(aYend,bYstart)
-                Point.new(aXend,aYend)
-            elsif aYend < bYstart
+        if real_close(seg.x1,seg.x2)
+            seg_a,seg_b = [self, seg].sort { |x,y| x.y1 <=> y.y1 }
+            if real_close(seg_a.y2,seg_b.y1)
+                Point.new(seg_a.x2,seg_a.y2)
+            elsif seg_a.y2 < seg_b.y1
                 NoPoints.new
-            elsif aYend > bYend
-                LineSegment.new(bXstart,bYstart,bXend,bYend)
+            elsif seg_a.y2 > seg_b.y2
+                LineSegment.new(seg_b.x1,seg_b.y1,seg_b.x2,seg_b.y2)
             else
-                LineSegment.new(bXstart,bYstart,aXend,aYend)
+                LineSegment.new(seg_b.x1,seg_b.y1,seg_a.x2,seg_a.y2)
             end
         else
-            if x1start < x2start
-                aXstart,aYstart,aXend,aYend = seg1
-                bXstart,bYstart,bXend,bYend = seg2
-            else
-                aXstart,aYstart,aXend,aYend = seg2
-                bXstart,bYstart,bXend,bYend = seg1
-            end
-            if real_close(aYend,bYstart)
-                Point.new(aXend,aYend)
-            elsif aXend < bXstart
+            seg_a,seg_b = [self, seg].sort { |x,y| x.x1 <=> y.x1 }
+            if real_close(seg_a.y2,seg_b.y1)
+                Point.new(seg_a.x2,seg_a.y2)
+            elsif seg_a.x2 < seg_b.x1
                 NoPoints.new
-            elsif aXend > bXend
-                LineSegment.new(bXstart,bYstart,bXend,bYend)
+            elsif seg_a.x2 > seg_b.x2
+                LineSegment.new(seg_b.x1,seg_b.y1,seg_b.x2,seg_b.y2)
             else
-                LineSegment.new(bXstart,bYstart,aXend,aYend)
+                LineSegment.new(seg_b.x1,seg_b.y1,seg_a.x2,seg_a.y2)
             end
         end
     end
